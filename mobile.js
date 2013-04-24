@@ -54,7 +54,7 @@ subscribePE = function() {
     var appKey = regidAppkeyMap[uidRegidMap[keys[i]]];
     var topics = config.topics[appKey]
     for (var j = 0; j < topics.length; j++) {
-      options.path = "/usrs/" + keys[i] + "/subscriptions/" + topics[j]
+      options.path = "/subscriber/" + keys[i] + "/subscriptions/" + topics[j]
       var req = http.request(options, function(response) { });
       req.end();
     }
@@ -64,7 +64,7 @@ subscribePE = function() {
 connectPE = function() {
   var options = {
     host: config.pushEngineHost,
-    path: "/users",
+    path: "/subscribers",
     port: config.pushEnginePort,
     method: "POST",
     headers: {
