@@ -9,4 +9,7 @@ npm install
 node mobile.js ./config/single.json
 
 2. Multi instances
-to be done
+prepare the config files in one dir
+./create_instances.sh <your config file dir>
+
+once you want to delete those instances, run ./remove_instances.sh
