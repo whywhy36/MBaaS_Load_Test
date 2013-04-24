@@ -1,0 +1,11 @@
+{
+  "regServerHost": "localhost",
+  "regServerPort": "9999",
+  "pushNetworkHost": "localhost",
+  "pushNetworkPort": "8080",
+  "pushEngineHost": "localhost",
+  "pushEnginePort": "3000",
+  "deviceFingerprint": "1111",
+  "appKeys": [ "100", "101" ],
+  "topics": {"100": ["top00"], "101": ["top10", "top11"]} 
+}
