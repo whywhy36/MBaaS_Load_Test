@@ -25,7 +25,7 @@ connectPN = function() {
       for (var i = 0; i < pushInfo.info.length; i++) {
         var msg = pushInfo.info[i];
         var acceptMsgIds = [];
-        console.log("Received messages for ", regidAppkeyMap[msg.regId]);
+        console.log("Received messages for app", regidAppkeyMap[msg.regId]);
         for (var j = 0; j < msg.messages.length; j++) {
           console.log("-- " + msg.messages[j].content);
           acceptMsgIds.push(msg.messages[j].id);
@@ -46,15 +46,22 @@ subscribePE = function() {
   };
 
   var keys = Object.keys(uidRegidMap);
-  for (var i = 0; i < keys.length; i++) {
-    var appKey = regidAppkeyMap[uidRegidMap[keys[i]]];
-    var topics = config.topics[appKey]
-    for (var j = 0; j < topics.length; j++) {
-      options.path = "/subscriber/" + keys[i] + "/subscriptions/" + topics[j]
-      var req = http.request(options, function(response) { });
+  async.forEachSeries(keys, function(key, callback) {
+    var appKey = regidAppkeyMap[uidRegidMap[key]];
+    var topics = config.topics[appKey];
+    async.forEachSeries(topics, function(topic, cb) {
+      options.path = "/subscriber/" + key + "/subscriptions/" + topic;
+      var req = http.request(options, function(response) { 
+        if ( response.statusCode >= 200 && response.statusCode <= 204 ) {
+          console.log("Successfully subscribe topic, subscriber id: " + key + " , topic: " + topic);
+        }
+        cb();
+      });
       req.end();
-    }
-  }
+    }, function(err) { 
+      callback();
+    });
+  }, function(err) { });
 }
 
 connectPE = function() {
@@ -78,7 +85,7 @@ connectPE = function() {
       response.on("end", function () {
         var data = JSON.parse(str);
         uidRegidMap[data.id] = regId;
-        console.log("Successfully subscribe on push engine, reg id: " + regId + " , subscribe id: " + data.id);
+        console.log("Successfully subscribe on push engine, reg id: " + regId + " , subscriber id: " + data.id);
         callback();
       });
     });
