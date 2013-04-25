@@ -25,10 +25,9 @@ connectPN = function() {
       for (var i = 0; i < pushInfo.info.length; i++) {
         var msg = pushInfo.info[i];
         var acceptMsgIds = [];
-        console.log("");
-        console.log("Messages for ", regidAppkeyMap[msg.regId]);
+        console.log("Received messages for ", regidAppkeyMap[msg.regId]);
         for (var j = 0; j < msg.messages.length; j++) {
-          console.log(msg.messages[j].content);
+          console.log("-- " + msg.messages[j].content);
           acceptMsgIds.push(msg.messages[j].id);
         }
         res.info.push({"regId": msg.regId, "messageIds": acceptMsgIds});
@@ -43,10 +42,7 @@ subscribePE = function() {
   var options = {
     host: config.pushEngineHost,
     port: config.pushEnginePort,
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json"
-    }
+    method: "POST"
   };
 
   var keys = Object.keys(uidRegidMap);
@@ -82,6 +78,7 @@ connectPE = function() {
       response.on("end", function () {
         var data = JSON.parse(str);
         uidRegidMap[data.id] = regId;
+        console.log("Successfully subscribe on push engine, reg id: " + regId + " , subscribe id: " + data.id);
         callback();
       });
     });
@@ -115,11 +112,11 @@ async.forEachSeries(config.appKeys, function(appKey, callback) {
       var data = JSON.parse(str);
       regIds.push(data.regId);
       regidAppkeyMap[data.regId] = appKey;
-      console.log("Successfull register to regserver, app key:", appKey, ", reg id:", data.regId);
+      console.log("Successfully register to regserver, app key:", appKey, ", reg id:", data.regId);
       callback();
     });
   });
-  req.write(JSON.stringify({ "appKey": appKey, "deviceFingerprint": config.deviceFingerprint }));
+  req.write(JSON.stringify({ "appKey": appKey, "deviceFingerPrint": config.deviceFingerprint }));
   req.end();
 }, function(err) {
   if (!err) {
