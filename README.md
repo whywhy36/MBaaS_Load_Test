@@ -9,7 +9,12 @@ npm install
 node mobile.js ./config/single.json
 
 2. Multi instances
-prepare the config files in one dir
+-- Create 
+prepare the config files in a dir
 ./create_instances.sh <your config file dir>
 
-once you want to delete those instances, run ./remove_instances.sh
+-- Delete
+./remove_instances.sh
+
+-- log
+/var/tmp/mbaas-test/log*

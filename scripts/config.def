@@ -1,0 +1,2 @@
+LOG_DIR=/var/tmp/mbaas-test/log
+PID_DIR=/var/tmp/mbaas-test/pid

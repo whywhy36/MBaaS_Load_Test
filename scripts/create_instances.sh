@@ -10,15 +10,19 @@ err() {
   exit -1
 }
 
-LOG_DIR=/var/tmp/mbaas-test/log
-PID_DIR=/var/tmp/mbaas-test/pid
-CONFIG_DIR=$1
+abs_path() {
+  path=$PWD
+  cd $1
+  pwd
+  cd ${path}
+}
+
+. `dirname $0`/config.def
 
 ### environment check
 
 [ $# -ne 1 ] && usage
-[ ! -d ${CONFIG_DIR} ] && err "$1 not exist."
-[ ! -f ./mobile.js ] && err "mobile.js missed."
+[ ! -d $1 ] && err "$1 not exist."
 
 which npm > /dev/null 2>&1
 [ $? -ne 0 ] && err "npm missed."
@@ -30,8 +34,13 @@ which node > /dev/null 2>&1
 [ ! -d $PID_DIR ] && mkdir -p $PID_DIR
 
 ### start instances
+
+CONFIG_DIR=`abs_path $1`
+
 npm install
 [ $? -ne 0 ] && err
+
+cd `dirname $0`/..
 
 for file in `ls ${CONFIG_DIR}/*.json`
 do
