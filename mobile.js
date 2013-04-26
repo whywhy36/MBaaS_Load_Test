@@ -12,30 +12,53 @@ var regidAppkeyMap = {};
 var uidRegidMap = {};
 
 connectPN = function() {
-  var socket = require("socket.io-client").connect(config.pushNetworkHost, {port: config.pushNetworkPort});
-  socket.on("connect", function(){
 
-    socket.emit("addRegId", JSON.stringify({"seq":"12345", "regIds":regIds}));
+  var WebSocketClient = require("websocket").client;
+  var client = new WebSocketClient();
 
-    socket.on("push", function(data){
-      var pushInfo = JSON.parse(data);
-      var res = {};
-      res.seq = "12345";
-      res.info = [];
-      for (var i = 0; i < pushInfo.info.length; i++) {
-        var msg = pushInfo.info[i];
-        var acceptMsgIds = [];
-        console.log("Received messages for app", regidAppkeyMap[msg.regId]);
-        for (var j = 0; j < msg.messages.length; j++) {
-          console.log("-- " + msg.messages[j].content);
-          acceptMsgIds.push(msg.messages[j].id);
-        }
-        res.info.push({"regId": msg.regId, "messageIds": acceptMsgIds});
-      }
-      socket.emit("pushAck", JSON.stringify(res));
+  client.on("connectFailed", function(error) {
+    console.log("Connect Error: " + error.toString());
+  });
+
+  client.on("connect", function(connection) {
+    console.log("WebSocket client connected");
+
+    connection.on("error", function(error) {
+      console.log("Connection Error: " + error.toString());
     });
 
+    connection.on("close", function() {
+      console.log("Connection Closed");
+    });
+
+    connection.on("message", function(message) {
+      if (message.type != "utf8") {
+        return;
+      }
+
+      var pushInfo = JSON.parse(message.utf8Data);
+      if ( pushInfo.event === "push" ) {
+        var res = {"event": "pushAck", "seq": "12345", "info": []};
+        for (var i = 0; i < pushInfo.info.length; i++) {
+          var msg = pushInfo.info[i];
+          var acceptMsgIds = [];
+          console.log("Received messages for app", regidAppkeyMap[msg.regId]);
+          for (var j = 0; j < msg.messages.length; j++) {
+            console.log("-- " + msg.messages[j].content);
+            acceptMsgIds.push(msg.messages[j].id);
+          }
+          res.info.push({"regId": msg.regId, "messageIds": acceptMsgIds});
+        }
+        connection.sendUTF(JSON.stringify(res));
+      }
+    });
+
+    connection.sendUTF(JSON.stringify({"event": "addRegId", "seq":"12345", "regIds":regIds}));
+
   });
+
+  client.connect("ws://" + config.pushNetworkHost + ":" + config.pushNetworkPort + "/", "msg-json");
+
 }
 
 subscribePE = function() {
