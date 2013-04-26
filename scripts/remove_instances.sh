@@ -4,7 +4,7 @@
 
 [ ! -d ${PID_DIR} ] && exit
 
-kill -9 `ls ${PID_DIR}`
+kill -9 `ls ${PID_DIR}` > /dev/null 2>&1
 rm -f ${PID_DIR}/*
 
 [ ! -d ${LOG_DIR} ] && exit
