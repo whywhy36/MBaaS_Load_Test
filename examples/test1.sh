@@ -15,7 +15,7 @@ export APP_KEY2="301"
 
 export TOPIC="sports-$$"
 
-export MESSAGE_NUM=10
+export MESSAGE_NUM=20
 export MESSAGE_PRE="sports-news-"
 
 . `dirname $0`/../scripts/config.def
@@ -33,7 +33,7 @@ echo "Create config files, dir: ${etc_dir}"
 
 for n in `seq 1 ${DEVICE_NUM}`
 do
-deviceid=$((n+DEVICE_ID_FROM))
+deviceid=$$-$((n+DEVICE_ID_FROM))
 cat > ${etc_dir}/${deviceid}.json << EOF
 {
   "regServerHost": "${REG_SERVER}",
@@ -52,8 +52,8 @@ done
 echo "Create ${DEVICE_NUM} mobile instances"
 `dirname $0`/../scripts/create_instances.sh ${etc_dir}
 
-echo "sleep 5"
-sleep 10
+echo "sleep ${DEVICE_NUM}"
+sleep ${DEVICE_NUM}
 
 echo "Send ${MESSAGE_NUM} messages from push engine."
 for n in `seq -w 1 ${MESSAGE_NUM}`; do
@@ -61,8 +61,8 @@ for n in `seq -w 1 ${MESSAGE_NUM}`; do
   curl -X POST -d "msg=${MESSAGE_PRE}${n}" http://${PE_SERVER}:${PE_PORT}/event/${TOPIC}
 done
 
-echo "sleep 5"
-sleep 5
+echo "sleep ${MESSAGE_NUM}"
+sleep ${MESSAGE_NUM}
 
 cp -rf ${LOG_DIR}/* ${result_dir}
 
