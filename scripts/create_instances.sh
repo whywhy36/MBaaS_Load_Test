@@ -37,13 +37,16 @@ which node > /dev/null 2>&1
 
 CONFIG_DIR=`abs_path $1`
 
-npm install
+npm install > /dev/null 2>&1
 [ $? -ne 0 ] && err
 
 cd `dirname $0`/..
 
+num=0
 for file in `ls ${CONFIG_DIR}/*.json`
 do
+  num=$((num+1))
+  [ $((num%100)) -eq 0 ] && sleep 2
   log_file=`basename ${file} | sed "s/.json$//g"`.log
   node mobile.js ${file} > ${LOG_DIR}/${log_file} 2>&1 &
   touch ${PID_DIR}/$!

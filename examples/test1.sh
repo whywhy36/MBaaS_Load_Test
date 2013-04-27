@@ -3,19 +3,19 @@
 export REG_SERVER="10.110.185.92"
 export REG_PORT="10080"
 export PN_SERVER="10.110.185.92"
-export PN_PORT="10280"
+export PN_PORT="8080"
 export PE_SERVER="10.110.185.90"
 export PE_PORT="80"
 
 export DEVICE_ID_FROM=100000
-export DEVICE_NUM=10
+export DEVICE_NUM=50
 
 export APP_KEY1="300"
 export APP_KEY2="301"
 
 export TOPIC="sports-$$"
 
-export MESSAGE_NUM=20
+export MESSAGE_NUM=100
 export MESSAGE_PRE="sports-news-"
 
 . `dirname $0`/../scripts/config.def
@@ -61,14 +61,16 @@ for n in `seq -w 1 ${MESSAGE_NUM}`; do
   curl -X POST -d "msg=${MESSAGE_PRE}${n}" http://${PE_SERVER}:${PE_PORT}/event/${TOPIC}
 done
 
-echo "sleep ${MESSAGE_NUM}"
-sleep ${MESSAGE_NUM}
+echo "sleep $((DEVICE_NUM*MESSAGE_NUM/5))"
+sleep $((DEVICE_NUM*MESSAGE_NUM/5))
 
 cp -rf ${LOG_DIR}/* ${result_dir}
 
 echo "Remove mobile instances"
 `dirname $0`/../scripts/remove_instances.sh
 
+echo ""
+date
 echo ""
 
 # template result

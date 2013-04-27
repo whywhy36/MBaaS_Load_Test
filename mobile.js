@@ -27,8 +27,8 @@ connectPN = function() {
       console.log("Connection Error: " + error.toString());
     });
 
-    connection.on("close", function() {
-      console.log("Connection Closed");
+    connection.on("close", function(reasonCode, description) {
+      console.log("Connection Closed, reasonCode: %d, description %s", reasonCode, description);
     });
 
     connection.on("message", function(message) {
